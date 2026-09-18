@@ -2,10 +2,12 @@ schema: spec-driven
 
 context: |
   Tienda Cata es una app sencilla para exhibir productos para vender.
-  Requisito confirmado: el administrador puede subir imagenes de sus productos.
+  Requisito confirmado: el vendedor carga productos desde el telefono, puede tomar
+  o seleccionar imagen, agrega precio y publica.
   Base actual: Next.js 16.3.5, React 19, TypeScript y Tailwind CSS 4, con npm.
-  El proyecto conserva la pantalla inicial de Next.js; no hay backend de productos,
-  autenticacion ni almacenamiento de imagenes implementados.
+  El proyecto conserva la pantalla inicial de Next.js; no hay pantallas de negocio implementadas.
+  Backend elegido: PocketBase para datos y archivos, con SDK oficial instalado y
+  MCP local `mcp-tienda-cata` verificado. Las credenciales viven en `.env.local`.
   Mantener el alcance pequeno y la interfaz en espanol, adaptable a celulares.
   Requisitos confirmados: carrito de compras y cobros con Mercado Pago.
   No asumir integraciones de envios, control de stock ni proveedores adicionales.
@@ -17,7 +19,6 @@ rules:
     - Separar requisitos confirmados, alcance propuesto y decisiones pendientes.
   specs:
     - Escribir en espanol conservando Requirement, Scenario, SHALL, WHEN y THEN.
-    - Cubrir permisos del administrador, persistencia y errores de carga de imagenes.
+    - Cubrir permisos del vendedor, persistencia y errores de carga de imagenes.
   tasks:
     - Incluir una verificacion observable en cada tarea.
-
