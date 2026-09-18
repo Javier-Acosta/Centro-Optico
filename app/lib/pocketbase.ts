@@ -84,3 +84,75 @@ export async function getPublishedProductsByIds(ids: string[]) {
   });
   return records.map((record) => mapProduct(record as unknown as Record<string, unknown>));
 }
+
+export type OrderItemSnapshot = {
+  productName: string;
+  unitPriceMinor: number;
+  quantity: number;
+  subtotalMinor: number;
+};
+
+export type Order = {
+  id: string;
+  email: string;
+  publicToken: string;
+  status: OrderStatus;
+  totalMinor: number;
+  currency: string;
+  items?: OrderItemSnapshot[];
+};
+
+export async function getOrderByToken(token: string) {
+  const pb = await createSuperuserPocketBase();
+  const order = await pb.collection("orders").getFirstListItem(`publicToken = "${token.replaceAll('"', "")}"`, {
+    requestKey: null,
+  });
+  const items = await pb.collection("order_items").getFullList({
+    filter: `order = "${order.id}"`,
+    sort: "created",
+    requestKey: null,
+  });
+
+  return {
+    id: String(order.id),
+    email: String(order.email || ""),
+    publicToken: String(order.publicToken || ""),
+    status: (String(order.status || "pending") as OrderStatus),
+    totalMinor: Number(order.totalMinor || 0),
+    currency: String(order.currency || "ARS"),
+    items: items.map((item) => ({
+      productName: String(item.productName || ""),
+      unitPriceMinor: Number(item.unitPriceMinor || 0),
+      quantity: Number(item.quantity || 0),
+      subtotalMinor: Number(item.subtotalMinor || 0),
+    })),
+  } satisfies Order;
+}
+
+export async function listOrdersForSeller() {
+  const pb = await createSuperuserPocketBase();
+  const orders = await pb.collection("orders").getFullList({ sort: "-created", requestKey: null });
+  return Promise.all(
+    orders.map(async (order) => {
+      const items = await pb.collection("order_items").getFullList({
+        filter: `order = "${order.id}"`,
+        sort: "created",
+        requestKey: null,
+      });
+      return {
+        id: String(order.id),
+        email: String(order.email || ""),
+        publicToken: String(order.publicToken || ""),
+        status: (String(order.status || "pending") as OrderStatus),
+        totalMinor: Number(order.totalMinor || 0),
+        currency: String(order.currency || "ARS"),
+        items: items.map((item) => ({
+          productName: String(item.productName || ""),
+          unitPriceMinor: Number(item.unitPriceMinor || 0),
+          quantity: Number(item.quantity || 0),
+          subtotalMinor: Number(item.subtotalMinor || 0),
+        })),
+      } satisfies Order;
+    }),
+  );
+}

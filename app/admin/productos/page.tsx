@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProductForm } from "../../components/product-form";
 import { formatMoney } from "../../lib/money";
-import { listAllProductsForSeller } from "../../lib/pocketbase";
+import { listAllProductsForSeller, listOrdersForSeller } from "../../lib/pocketbase";
 import { isSellerAuthenticated } from "../../lib/session";
 import { logoutSeller, setProductPublished } from "../../lib/actions";
 
@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function ProductsAdminPage() {
   if (!(await isSellerAuthenticated())) redirect("/admin");
   const products = await listAllProductsForSeller();
+  const orders = await listOrdersForSeller();
 
   return (
     <main className="min-h-screen bg-zinc-50">
@@ -34,6 +35,7 @@ export default async function ProductsAdminPage() {
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[380px_1fr]">
         <ProductForm />
 
+        <div className="grid gap-6">
         <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <h2 className="text-lg font-semibold text-zinc-950">Cargados</h2>
           <div className="mt-4 grid gap-3">
@@ -62,7 +64,33 @@ export default async function ProductsAdminPage() {
             ))}
           </div>
         </section>
+
+        <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+          <h2 className="text-lg font-semibold text-zinc-950">Pedidos</h2>
+          <div className="mt-4 grid gap-3">
+            {orders.length === 0 ? <p className="text-sm text-zinc-600">Todavia no hay pedidos.</p> : null}
+            {orders.map((order) => (
+              <article key={order.id} className="rounded-lg border border-zinc-200 p-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-zinc-950">{order.email}</p>
+                    <p className="text-sm text-zinc-600">{order.items?.length || 0} articulos</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-zinc-950">{formatMoney(order.totalMinor, order.currency)}</p>
+                    <p className="text-sm text-zinc-500">{order.status}</p>
+                  </div>
+                </div>
+                <Link href={`/pedido/${order.publicToken}`} className="mt-3 inline-flex text-sm font-medium text-zinc-950 underline">
+                  Ver estado
+                </Link>
+              </article>
+            ))}
+          </div>
+        </section>
+        </div>
       </div>
     </main>
   );
 }
+

@@ -1,10 +1,11 @@
 'use server';
 
+import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSellerSession, clearSellerSession, isSellerAuthenticated } from "./session";
-import { createSuperuserPocketBase } from "./pocketbase";
+import { createSuperuserPocketBase, getPublishedProductsByIds } from "./pocketbase";
 import { parsePriceToMinor } from "./money";
 
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -117,3 +118,65 @@ export async function setProductPublished(formData: FormData) {
   revalidatePath("/admin/productos");
 }
 
+
+type CartInput = { id: string; quantity: number };
+
+function parseCartItems(value: FormDataEntryValue | null) {
+  if (!value || typeof value !== "string") return [];
+  const parsed = JSON.parse(value) as CartInput[];
+  return parsed
+    .map((item) => ({ id: String(item.id || ""), quantity: Number(item.quantity) }))
+    .filter((item) => /^[A-Za-z0-9_-]+$/.test(item.id) && Number.isInteger(item.quantity) && item.quantity > 0);
+}
+
+export async function createOrder(_state: ActionState, formData: FormData): Promise<ActionState> {
+  await verifySameOrigin();
+
+  const email = String(formData.get("email") || "").trim();
+  const items = parseCartItems(formData.get("items"));
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { message: "Ingresa un email valido." };
+  if (items.length === 0) return { message: "El carrito esta vacio." };
+
+  const products = await getPublishedProductsByIds([...new Set(items.map((item) => item.id))]);
+  if (products.length !== new Set(items.map((item) => item.id)).size) {
+    return { message: "Hay productos que ya no estan publicados. Revisa el carrito." };
+  }
+
+  const productMap = new Map(products.map((product) => [product.id, product]));
+  const snapshots = items.map((item) => {
+    const product = productMap.get(item.id);
+    if (!product) throw new Error("Producto no encontrado.");
+    return {
+      product,
+      quantity: item.quantity,
+      subtotalMinor: product.priceMinor * item.quantity,
+    };
+  });
+  const totalMinor = snapshots.reduce((sum, item) => sum + item.subtotalMinor, 0);
+  const currency = snapshots[0]?.product.currency || "ARS";
+  const publicToken = randomBytes(32).toString("base64url");
+
+  const pb = await createSuperuserPocketBase();
+  const order = await pb.collection("orders").create({
+    email,
+    publicToken,
+    status: "pending",
+    totalMinor,
+    currency,
+  });
+
+  for (const item of snapshots) {
+    await pb.collection("order_items").create({
+      order: order.id,
+      product: item.product.id,
+      productName: item.product.name,
+      unitPriceMinor: item.product.priceMinor,
+      quantity: item.quantity,
+      subtotalMinor: item.subtotalMinor,
+    });
+  }
+
+  revalidatePath("/admin/productos");
+  redirect(`/pedido/${publicToken}`);
+}
