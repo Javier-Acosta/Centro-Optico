@@ -1,0 +1,23 @@
+schema: spec-driven
+
+context: |
+  Tienda Cata es una app sencilla para exhibir productos para vender.
+  Requisito confirmado: el administrador puede subir imagenes de sus productos.
+  Base actual: Next.js 16.3.5, React 19, TypeScript y Tailwind CSS 4, con npm.
+  El proyecto conserva la pantalla inicial de Next.js; no hay backend de productos,
+  autenticacion ni almacenamiento de imagenes implementados.
+  Mantener el alcance pequeno y la interfaz en espanol, adaptable a celulares.
+  Requisitos confirmados: carrito de compras y cobros con Mercado Pago.
+  No asumir integraciones de envios, control de stock ni proveedores adicionales.
+  Antes de implementar Next.js, leer node_modules/next/dist/docs/ como indica AGENTS.md.
+
+rules:
+  proposal:
+    - Escribir en espanol conservando los encabezados requeridos por el esquema.
+    - Separar requisitos confirmados, alcance propuesto y decisiones pendientes.
+  specs:
+    - Escribir en espanol conservando Requirement, Scenario, SHALL, WHEN y THEN.
+    - Cubrir permisos del administrador, persistencia y errores de carga de imagenes.
+  tasks:
+    - Incluir una verificacion observable en cada tarea.
+

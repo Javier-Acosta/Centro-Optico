@@ -34,3 +34,25 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## OpenSpec
+
+OpenSpec esta instalado como dependencia de desarrollo, con integracion para Codex
+ en `.agents/skills/`. Despues de clonar, ejecutar `npm ci`.
+
+```bash
+npx openspec --version
+npx openspec list
+npx openspec status --change catalogo-productos
+npx openspec validate --all --strict
+```
+
+Idea inicial: una app sencilla donde el administrador carga imagenes de sus
+productos para venderlos. Las propuestas se guardan en `openspec/changes/`;
+las especificaciones consolidadas se guardan en `openspec/specs/` al archivar
+un cambio implementado.
+
+En Codex se puede usar `$openspec-propose` para preparar un cambio y
+`$openspec-apply-change` para implementar una propuesta completa.
+
+Documentacion: https://openspec.dev/docs/
