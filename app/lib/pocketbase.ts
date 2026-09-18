@@ -13,14 +13,18 @@ export type Product = {
 
 export type OrderStatus = "pending" | "approved" | "rejected";
 
-const url = process.env.POCKETBASE_URL;
+function pocketBaseUrl() {
+  const url = process.env.POCKETBASE_URL;
 
-if (!url) {
-  throw new Error("POCKETBASE_URL no esta definida.");
+  if (!url) {
+    throw new Error("POCKETBASE_URL no esta definida.");
+  }
+
+  return url;
 }
 
 export function createPocketBase() {
-  return new PocketBase(url);
+  return new PocketBase(pocketBaseUrl());
 }
 
 export async function createSuperuserPocketBase() {
@@ -156,3 +160,4 @@ export async function listOrdersForSeller() {
     }),
   );
 }
+
