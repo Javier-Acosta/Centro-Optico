@@ -39,3 +39,12 @@ Variable opcional:
 
 No hay cobros automaticos en esta etapa. El pago y la entrega se coordinan manualmente por WhatsApp.
 
+
+## Acceso del vendedor
+
+El panel `/admin` puede usar credenciales simples de vendedor configuradas por variables de entorno, separadas del superusuario de PocketBase:
+
+- `SELLER_EMAIL`
+- `SELLER_PASSWORD`
+
+Si esas variables no existen, el login conserva el fallback al superusuario de PocketBase.

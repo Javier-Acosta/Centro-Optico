@@ -33,6 +33,18 @@ export async function loginSeller(_state: ActionState, formData: FormData): Prom
   if (!email || !password) return { message: "Ingresa email y contrasena." };
 
   try {
+    const sellerEmail = process.env.SELLER_EMAIL;
+    const sellerPassword = process.env.SELLER_PASSWORD;
+
+    if (sellerEmail && sellerPassword) {
+      if (email.toLowerCase() !== sellerEmail.toLowerCase() || password !== sellerPassword) {
+        return { message: "Los datos no coinciden con el vendedor configurado." };
+      }
+
+      await createSellerSession();
+      redirect("/admin/productos");
+    }
+
     const expectedEmail = process.env.POCKETBASE_SUPERUSER_EMAIL;
     if (expectedEmail && email.toLowerCase() !== expectedEmail.toLowerCase()) {
       return { message: "Los datos no coinciden con el vendedor configurado." };
@@ -181,6 +193,7 @@ export async function createOrder(_state: ActionState, formData: FormData): Prom
   revalidatePath("/admin/productos");
   redirect(`/pedido/${publicToken}/whatsapp`);
 }
+
 
 
 
