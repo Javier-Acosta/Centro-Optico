@@ -1,16 +1,18 @@
 'use client';
 
 import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { loginSeller, type ActionState } from "../lib/actions";
 
 const initialState: ActionState = {};
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(loginSeller, initialState);
+  const router = useRouter();
 
   useEffect(() => {
-    if (state.ok) window.location.href = "/admin/productos";
-  }, [state.ok]);
+    if (state.ok) router.push("/admin/productos");
+  }, [router, state.ok]);
 
   return (
     <form action={action} className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
@@ -29,4 +31,5 @@ export function LoginForm() {
     </form>
   );
 }
+
 
