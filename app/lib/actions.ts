@@ -42,7 +42,7 @@ export async function loginSeller(_state: ActionState, formData: FormData): Prom
       }
 
       await createSellerSession();
-      redirect("/admin/productos");
+      return { ok: true };
     }
 
     const expectedEmail = process.env.POCKETBASE_SUPERUSER_EMAIL;
@@ -193,6 +193,7 @@ export async function createOrder(_state: ActionState, formData: FormData): Prom
   revalidatePath("/admin/productos");
   redirect(`/pedido/${publicToken}/whatsapp`);
 }
+
 
 
 
