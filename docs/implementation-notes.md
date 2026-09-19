@@ -13,7 +13,7 @@ APIs elegidas despues de leer la documentacion local de Next.js 16.3.5 indicada 
 Estado de alcance:
 
 - Implementado: colecciones PocketBase base, login vendedor, carga de productos con imagen validada, catalogo publico y carrito local.
-- Pendiente: creacion real de pedidos, Mercado Pago, webhook y reconciliacion.
+- Implementado: creacion real de pedidos pendientes y envio del resumen por WhatsApp.
 
 ## Despliegue en Dokploy
 
@@ -29,14 +29,13 @@ Variables de entorno requeridas en Dokploy:
 
 El archivo `.env.local` queda fuera de la imagen Docker mediante `.dockerignore`; las credenciales deben cargarse en Dokploy como variables de entorno.
 
-## Mercado Pago en modo prueba
+## WhatsApp para pedidos
 
-El checkout de Mercado Pago se habilita solo cuando el entorno tiene credenciales de prueba y firma de webhook configuradas. Si faltan esas variables, el sistema conserva el pedido como pendiente y no redirige a Mercado Pago.
+El MVP usa WhatsApp para simplificar la venta. Al confirmar el carrito, el servidor crea el pedido pendiente en PocketBase, recalcula precios vigentes y redirige a WhatsApp con un mensaje que incluye productos, cantidades, total, email y referencia del pedido.
 
-Variables requeridas para probar checkout:
+Variable opcional:
 
-- `MERCADO_PAGO_ACCESS_TOKEN`: debe comenzar con `TEST-`; los tokens productivos quedan rechazados por seguridad en esta etapa.
-- `MERCADO_PAGO_WEBHOOK_SECRET`: clave secreta configurada en Mercado Pago para validar `x-signature`.
-- `NEXT_PUBLIC_APP_URL`: URL publica HTTPS de la app, usada para `notification_url` y retornos.
+- `SELLER_WHATSAPP_NUMBER`: numero internacional del vendedor sin `+`, espacios ni guiones. Valor actual por defecto: `5493834523879`.
 
-El retorno del navegador no marca pedidos como pagos por si solo. Tanto el webhook como la pagina de retorno consultan el pago en Mercado Pago desde servidor y verifican referencia, importe y moneda antes de actualizar el pedido.
+No hay cobros automaticos en esta etapa. El pago y la entrega se coordinan manualmente por WhatsApp.
+

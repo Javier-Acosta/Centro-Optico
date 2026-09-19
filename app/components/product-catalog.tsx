@@ -143,9 +143,9 @@ export function ProductCatalog({ products }: { products: Product[] }) {
                 className="w-full rounded-md bg-zinc-950 px-4 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300"
                 disabled={orderPending || cart.length === 0}
               >
-                {orderPending ? "Preparando checkout..." : "Ir a pagar"}
+                {orderPending ? "Preparando WhatsApp..." : "Enviar pedido por WhatsApp"}
               </button>
-              <p className="text-xs text-zinc-500">Si Mercado Pago de prueba esta configurado, te llevaremos al checkout seguro. Si no, el pedido queda pendiente.</p>
+              <p className="text-xs text-zinc-500">Se creara el pedido pendiente y se abrira WhatsApp con el resumen para coordinar pago y entrega.</p>
             </form>
           </div>
         )}
@@ -153,6 +153,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
     </div>
   );
 }
+
 
 
 

@@ -9,7 +9,7 @@ context: |
   Backend elegido: PocketBase para datos y archivos, con SDK oficial instalado y
   MCP local `mcp-tienda-cata` verificado. Las credenciales viven en `.env.local`.
   Mantener el alcance pequeno y la interfaz en espanol, adaptable a celulares.
-  Requisitos confirmados: carrito de compras y cobros con Mercado Pago.
+  Requisitos confirmados: carrito de compras y contacto por WhatsApp para coordinar pago y entrega.
   No asumir integraciones de envios, control de stock ni proveedores adicionales.
   Antes de implementar Next.js, leer node_modules/next/dist/docs/ como indica AGENTS.md.
 
@@ -22,3 +22,4 @@ rules:
     - Cubrir permisos del vendedor, persistencia y errores de carga de imagenes.
   tasks:
     - Incluir una verificacion observable en cada tarea.
+
