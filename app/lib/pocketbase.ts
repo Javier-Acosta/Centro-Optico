@@ -63,7 +63,7 @@ export async function listPublishedProducts() {
   const pb = createPocketBase();
   const records = await pb.collection("products").getFullList({
     filter: "published = true",
-    sort: "-created",
+    sort: "-id",
     requestKey: null,
   });
   return records.map((record) => mapProduct(record as unknown as Record<string, unknown>));
@@ -72,7 +72,7 @@ export async function listPublishedProducts() {
 export async function listAllProductsForSeller() {
   const pb = await createSuperuserPocketBase();
   const records = await pb.collection("products").getFullList({
-    sort: "-created",
+    sort: "-id",
     requestKey: null,
   });
   return records.map((record) => mapProduct(record as unknown as Record<string, unknown>));
@@ -113,7 +113,7 @@ export async function getOrderByToken(token: string) {
   });
   const items = await pb.collection("order_items").getFullList({
     filter: `order = "${order.id}"`,
-    sort: "created",
+    sort: "id",
     requestKey: null,
   });
 
@@ -135,12 +135,12 @@ export async function getOrderByToken(token: string) {
 
 export async function listOrdersForSeller() {
   const pb = await createSuperuserPocketBase();
-  const orders = await pb.collection("orders").getFullList({ sort: "-created", requestKey: null });
+  const orders = await pb.collection("orders").getFullList({ sort: "-id", requestKey: null });
   return Promise.all(
     orders.map(async (order) => {
       const items = await pb.collection("order_items").getFullList({
         filter: `order = "${order.id}"`,
-        sort: "created",
+        sort: "id",
         requestKey: null,
       });
       return {
@@ -160,4 +160,5 @@ export async function listOrdersForSeller() {
     }),
   );
 }
+
 
