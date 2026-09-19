@@ -143,9 +143,9 @@ export function ProductCatalog({ products }: { products: Product[] }) {
                 className="w-full rounded-md bg-zinc-950 px-4 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300"
                 disabled={orderPending || cart.length === 0}
               >
-                {orderPending ? "Creando pedido..." : "Confirmar pedido"}
+                {orderPending ? "Preparando checkout..." : "Ir a pagar"}
               </button>
-              <p className="text-xs text-zinc-500">Mercado Pago se conectara en la siguiente etapa; el pedido queda pendiente.</p>
+              <p className="text-xs text-zinc-500">Si Mercado Pago de prueba esta configurado, te llevaremos al checkout seguro. Si no, el pedido queda pendiente.</p>
             </form>
           </div>
         )}
@@ -153,5 +153,6 @@ export function ProductCatalog({ products }: { products: Product[] }) {
     </div>
   );
 }
+
 
 

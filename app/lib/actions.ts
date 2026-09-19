@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { createSellerSession, clearSellerSession, isSellerAuthenticated } from "./session";
 import { createSuperuserPocketBase, getPublishedProductsByIds } from "./pocketbase";
 import { parsePriceToMinor } from "./money";
+import { createCheckoutPreference } from "./mercado-pago";
 
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 const maxImageSize = 5 * 1024 * 1024;
@@ -177,6 +178,21 @@ export async function createOrder(_state: ActionState, formData: FormData): Prom
     });
   }
 
+  const checkoutUrl = await createCheckoutPreference({
+    id: order.id,
+    email,
+    publicToken,
+    totalMinor,
+    currency,
+    items: snapshots.map((item) => ({
+      productName: item.product.name,
+      unitPriceMinor: item.product.priceMinor,
+      quantity: item.quantity,
+      subtotalMinor: item.subtotalMinor,
+    })),
+  }).catch(() => null);
+
   revalidatePath("/admin/productos");
-  redirect(`/pedido/${publicToken}`);
+  redirect(checkoutUrl || `/pedido/${publicToken}`);
 }
+

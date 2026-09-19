@@ -28,3 +28,15 @@ Variables de entorno requeridas en Dokploy:
 - `NEXT_PUBLIC_APP_URL`
 
 El archivo `.env.local` queda fuera de la imagen Docker mediante `.dockerignore`; las credenciales deben cargarse en Dokploy como variables de entorno.
+
+## Mercado Pago en modo prueba
+
+El checkout de Mercado Pago se habilita solo cuando el entorno tiene credenciales de prueba y firma de webhook configuradas. Si faltan esas variables, el sistema conserva el pedido como pendiente y no redirige a Mercado Pago.
+
+Variables requeridas para probar checkout:
+
+- `MERCADO_PAGO_ACCESS_TOKEN`: debe comenzar con `TEST-`; los tokens productivos quedan rechazados por seguridad en esta etapa.
+- `MERCADO_PAGO_WEBHOOK_SECRET`: clave secreta configurada en Mercado Pago para validar `x-signature`.
+- `NEXT_PUBLIC_APP_URL`: URL publica HTTPS de la app, usada para `notification_url` y retornos.
+
+El retorno del navegador no marca pedidos como pagos por si solo. Tanto el webhook como la pagina de retorno consultan el pago en Mercado Pago desde servidor y verifican referencia, importe y moneda antes de actualizar el pedido.
