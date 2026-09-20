@@ -45,3 +45,14 @@ El sistema SHALL verificar precios y publicacion en servidor antes de crear un p
 - **WHEN** un producto fue despublicado, marcado como vendido o cambio de precio desde que se agrego al carrito
 - **THEN** se informa el cambio y se requiere revisar el carrito antes de pagar
 
+
+### Requirement: Vista ampliada de producto
+El sistema SHALL permitir abrir una vista ampliada de un producto publicado desde el catalogo, mostrando imagen grande, nombre, descripcion, precio y estado vendido cuando corresponda.
+
+#### Scenario: Abrir producto
+- **WHEN** el visitante selecciona un producto publicado en el catalogo
+- **THEN** ve una vista ampliada con los detalles del producto y una forma clara de cerrarla
+
+#### Scenario: Producto vendido ampliado
+- **WHEN** el visitante abre un producto vendido
+- **THEN** la vista ampliada muestra el sello "Vendido" y no permite agregarlo al carrito

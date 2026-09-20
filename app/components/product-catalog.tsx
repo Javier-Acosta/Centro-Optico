@@ -11,6 +11,7 @@ const storageKey = "tienda-cata-cart";
 const initialOrderState: ActionState = {};
 
 export function ProductCatalog({ products }: { products: Product[] }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<CartLine[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -59,6 +60,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
   }
 
   return (
+    <>
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
       <section aria-label="Productos" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {products.length === 0 ? (
@@ -69,10 +71,10 @@ export function ProductCatalog({ products }: { products: Product[] }) {
 
         {products.map((product) => (
           <article key={product.id} className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-            <div className="relative">
+            <button type="button" onClick={() => setSelectedProduct(product)} className="relative block w-full text-left" aria-label={`Ver ${product.name} mas grande`}>
               {product.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={product.imageUrl} alt={product.name} className="aspect-square w-full object-cover" />
+                <img src={product.imageUrl} alt={product.name} className="aspect-square w-full object-cover transition hover:scale-[1.02]" />
               ) : (
                 <div className="aspect-square bg-zinc-100" />
               )}
@@ -81,10 +83,11 @@ export function ProductCatalog({ products }: { products: Product[] }) {
                   Vendido
                 </span>
               ) : null}
-            </div>
+              <span className="absolute bottom-3 right-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-zinc-800 shadow-sm">Ver mas</span>
+            </button>
             <div className="space-y-3 p-4">
               <div>
-                <h2 className="text-lg font-semibold text-zinc-950">{product.name}</h2>
+                <button type="button" onClick={() => setSelectedProduct(product)} className="text-left text-lg font-semibold text-zinc-950 hover:underline">{product.name}</button>
                 {product.description ? <p className="mt-1 line-clamp-3 text-sm text-zinc-600">{product.description}</p> : null}
               </div>
               <div className="flex items-center justify-between gap-3">
@@ -160,6 +163,48 @@ export function ProductCatalog({ products }: { products: Product[] }) {
         )}
       </aside>
     </div>
+
+    {selectedProduct ? (
+      <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-labelledby="product-modal-title" onClick={() => setSelectedProduct(null)}>
+        <div className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+          <div className="relative">
+            {selectedProduct.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="max-h-[70vh] w-full object-contain bg-zinc-100" />
+            ) : (
+              <div className="h-80 bg-zinc-100" />
+            )}
+            {selectedProduct.sold ? (
+              <span className="absolute left-4 top-4 rounded-full bg-red-600 px-4 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-sm">
+                Vendido
+              </span>
+            ) : null}
+            <button type="button" onClick={() => setSelectedProduct(null)} className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-2 text-sm font-semibold text-zinc-900 shadow-sm hover:bg-white">
+              Cerrar
+            </button>
+          </div>
+          <div className="space-y-4 p-5">
+            <div>
+              <p className="text-sm font-medium text-zinc-500">Producto</p>
+              <h2 id="product-modal-title" className="text-2xl font-bold text-zinc-950">{selectedProduct.name}</h2>
+              {selectedProduct.description ? <p className="mt-2 whitespace-pre-line text-sm text-zinc-600">{selectedProduct.description}</p> : null}
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
+              <span className="text-2xl font-bold text-zinc-950">{formatMoney(selectedProduct.priceMinor, selectedProduct.currency)}</span>
+              <button
+                type="button"
+                onClick={() => { add(selectedProduct); setSelectedProduct(null); }}
+                disabled={selectedProduct.sold}
+                className="rounded-md bg-zinc-950 px-4 py-3 font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+              >
+                {selectedProduct.sold ? "Vendido" : "Agregar al carrito"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : null}
+    </>
   );
 }
 

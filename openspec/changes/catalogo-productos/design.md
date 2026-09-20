@@ -19,10 +19,11 @@ La app actual conserva la plantilla inicial de Next.js 16.3.5 con React 19 y Typ
 5. Autenticacion: el vendedor entra por una ruta privada de la app. El servidor valida la sesion antes de modificar PocketBase. Las credenciales de superusuario PocketBase quedan solo en servidor para operaciones administrativas necesarias; no se envian al cliente. Sin registro publico de vendedores. Verificar autorizacion en cada operacion, no solo en la pagina.
 6. Formulario administrativo pensado primero para telefono: control de imagen compatible con camara y galeria, vista previa, campo de precio visible y accion clara para publicar. La descripcion puede ser opcional para que la carga diaria sea rapida.
 7. Validar contenido real, tamanos y formatos de imagen antes o durante la carga a PocketBase; aceptar JPEG, PNG y WebP hasta 5 MiB segun specs. Guardar referencias solo despues de una carga exitosa y evitar productos publicados con imagen rota.
-8. Carrito local con identificadores y cantidades. El cliente agrega productos desde el catalogo y el servidor recalcula precios consultando PocketBase al confirmar. Si cambian precio, publicacion o estado vendido, devuelve el carrito actualizado para que el comprador lo revise.
-9. Al confirmar el carrito, crear primero el pedido pendiente en PocketBase y luego abrir WhatsApp con un mensaje prearmado al numero del vendedor. El mensaje incluye referencia del pedido, productos, cantidades, total y email de contacto. El pedido no se marca como pagado automaticamente.
-10. Consulta del comprador mediante token aleatorio no predecible, sin exponer otros pedidos; lista de pedidos solo para vendedor. No incluir credenciales ni datos sensibles en logs.
-11. Usar el MCP local `mcp-tienda-cata` para inspeccionar colecciones y registros durante desarrollo, sin depender de el en runtime de la app.
+8. El catalogo permite abrir una vista ampliada de cada producto sin cambiar de pagina, para ver mejor la imagen y detalles antes de agregarlo al carrito.
+9. Carrito local con identificadores y cantidades. El cliente agrega productos desde el catalogo y el servidor recalcula precios consultando PocketBase al confirmar. Si cambian precio, publicacion o estado vendido, devuelve el carrito actualizado para que el comprador lo revise.
+10. Al confirmar el carrito, crear primero el pedido pendiente en PocketBase y luego abrir WhatsApp con un mensaje prearmado al numero del vendedor. El mensaje incluye referencia del pedido, productos, cantidades, total y email de contacto. El pedido no se marca como pagado automaticamente.
+11. Consulta del comprador mediante token aleatorio no predecible, sin exponer otros pedidos; lista de pedidos solo para vendedor. No incluir credenciales ni datos sensibles en logs.
+12. Usar el MCP local `mcp-tienda-cata` para inspeccionar colecciones y registros durante desarrollo, sin depender de el en runtime de la app.
 
 ## Risks / Trade-offs
 
@@ -46,4 +47,5 @@ La app actual conserva la plantilla inicial de Next.js 16.3.5 con React 19 y Typ
 - API de registros PocketBase: https://pocketbase.io/docs/api-records/
 - Autenticacion PocketBase: https://pocketbase.io/docs/authentication/
 - Enlaces Click to Chat de WhatsApp: https://faq.whatsapp.com/5913398998672934
+
 
