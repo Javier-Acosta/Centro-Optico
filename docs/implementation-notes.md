@@ -24,7 +24,6 @@ Variables de entorno requeridas en Dokploy:
 - `POCKETBASE_URL`
 - `POCKETBASE_SUPERUSER_EMAIL`
 - `POCKETBASE_SUPERUSER_PASSWORD`
-- `SELLER_SESSION_SECRET`
 - `NEXT_PUBLIC_APP_URL`
 
 El archivo `.env.local` queda fuera de la imagen Docker mediante `.dockerignore`; las credenciales deben cargarse en Dokploy como variables de entorno.
@@ -42,9 +41,19 @@ No hay cobros automaticos en esta etapa. El pago y la entrega se coordinan manua
 
 ## Acceso del vendedor
 
-El panel `/admin` puede usar credenciales simples de vendedor configuradas por variables de entorno, separadas del superusuario de PocketBase:
+El panel /admin autentica email y contrasena contra la coleccion de autenticacion `sellers` de PocketBase. No usa credenciales de vendedor en variables de entorno ni permite iniciar sesion con el superusuario.
 
-- `SELLER_EMAIL`
-- `SELLER_PASSWORD`
+Preparacion inicial: ejecutar `node scripts/setup-sellers.mjs` con las variables de PocketBase configuradas. El script es idempotente y no cambia contrasenas existentes. Para migrar una unica vez las antiguas variables locales SELLER_EMAIL y SELLER_PASSWORD, usar `node scripts/setup-sellers.mjs --migrate-local-seller` y luego eliminar esas dos variables.
 
-Si esas variables no existen, el login conserva el fallback al superusuario de PocketBase.
+Para crear vendedores:
+
+1. Entrar al panel de administracion de PocketBase (ruta /_/) con la cuenta de superusuario.
+2. Abrir Collections > sellers > New record.
+3. Completar email, password y passwordConfirm; name es opcional.
+4. Guardar y entrar a /admin de la tienda con esa cuenta.
+
+Las cuentas solo pueden ser gestionadas por el administrador de PocketBase. Todos los vendedores tienen acceso al mismo catalogo y pedidos. Para cambiar una contrasena, editar el registro desde PocketBase; para revocar una cuenta, eliminarla.
+
+La tienda guarda el token de PocketBase en una cookie HttpOnly, SameSite=Lax y Secure en produccion, con duracion maxima de ocho horas. Cada comprobacion de acceso valida el token con PocketBase. Eliminar la cuenta o cambiar su contrasena invalida el token anterior. Las sesiones anteriores al cambio dejan de ser validas.
+
+Despliegue: publicar el codigo actualizado en Dokploy. Mantener POCKETBASE_URL, POCKETBASE_SUPERUSER_EMAIL y POCKETBASE_SUPERUSER_PASSWORD para las operaciones de servidor existentes, y NEXT_PUBLIC_APP_URL con la URL publica. SELLER_EMAIL, SELLER_PASSWORD y SELLER_SESSION_SECRET ya no se utilizan y pueden eliminarse de Dokploy. El archivo .env.local no se incluye en Docker.

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSellerSession, clearSellerSession, isSellerAuthenticated } from "./session";
-import { createSuperuserPocketBase, getPublishedProductsByIds } from "./pocketbase";
+import { createPocketBase, createSuperuserPocketBase, getPublishedProductsByIds } from "./pocketbase";
 import { parsePriceToMinor } from "./money";
 
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -33,32 +33,13 @@ export async function loginSeller(_state: ActionState, formData: FormData): Prom
   if (!email || !password) return { message: "Ingresa email y contrasena." };
 
   try {
-    const sellerEmail = process.env.SELLER_EMAIL;
-    const sellerPassword = process.env.SELLER_PASSWORD;
-
-    if (sellerEmail && sellerPassword) {
-      if (email.toLowerCase() !== sellerEmail.toLowerCase() || password !== sellerPassword) {
-        return { message: "Los datos no coinciden con el vendedor configurado." };
-      }
-
-      await createSellerSession();
-      return { ok: true };
-    }
-
-    const expectedEmail = process.env.POCKETBASE_SUPERUSER_EMAIL;
-    if (expectedEmail && email.toLowerCase() !== expectedEmail.toLowerCase()) {
-      return { message: "Los datos no coinciden con el vendedor configurado." };
-    }
-
-    const pb = await createSuperuserPocketBase();
-    if (!pb.authStore.isValid) return { message: "No se pudo validar el vendedor." };
-
-    await createSellerSession();
+    const pb = createPocketBase();
+    const auth = await pb.collection("sellers").authWithPassword(email, password);
+    await createSellerSession(auth.token);
+    return { ok: true };
   } catch {
-    return { message: "No se pudo iniciar sesion. Revisa los datos." };
+    return { message: "No se pudo iniciar sesion. Revisa los datos o intenta nuevamente." };
   }
-
-  redirect("/admin/productos");
 }
 
 export async function logoutSeller() {
