@@ -12,7 +12,7 @@ El sistema SHALL exigir una sesion administrativa valida del vendedor para modif
 - **THEN** el sistema rechaza la operacion y no modifica datos
 
 ### Requirement: Publicacion persistente de productos
-El sistema SHALL permitir crear y editar productos desde un telefono con nombre, descripcion opcional, precio positivo e imagen, publicarlos, despublicarlos y marcarlos como vendidos o disponibles. Los datos, imagenes y estado vendido SHALL persistir tras reiniciar la aplicacion.
+El sistema SHALL permitir crear y editar productos desde un telefono con nombre, descripcion opcional, precio positivo e imagen, publicarlos, despublicarlos y marcarlos como vendidos o disponibles, y eliminarlos con confirmacion. Los datos, imagenes y estado vendido SHALL persistir tras reiniciar la aplicacion mientras el producto no sea eliminado.
 
 #### Scenario: Publicacion valida
 - **WHEN** el vendedor guarda un producto con nombre, precio positivo y al menos una imagen valida
@@ -49,3 +49,15 @@ El sistema SHALL aceptar JPEG, PNG y WebP de hasta 5 MiB por archivo, incluyendo
 - **WHEN** falla la carga de una imagen valida
 - **THEN** el sistema permite reintentar y no publica una referencia a una imagen inexistente
 
+
+
+### Requirement: Eliminacion de producto
+El sistema SHALL permitir que el vendedor elimine un producto desde el panel administrativo con confirmacion previa. Al eliminarlo, el registro y su imagen asociada SHALL dejar de estar disponibles.
+
+#### Scenario: Eliminacion confirmada
+- **WHEN** el vendedor confirma la eliminacion de un producto
+- **THEN** el producto se borra de PocketBase, deja de aparecer en el catalogo y no admite nuevas compras
+
+#### Scenario: Eliminacion cancelada
+- **WHEN** el vendedor cancela la confirmacion de eliminacion
+- **THEN** el producto permanece sin cambios

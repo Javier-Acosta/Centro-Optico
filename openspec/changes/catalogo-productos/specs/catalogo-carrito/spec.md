@@ -42,7 +42,7 @@ El sistema SHALL permitir que el cliente agregue productos publicados y disponib
 El sistema SHALL verificar precios y publicacion en servidor antes de crear un pedido y solicitar revision al cliente si cambiaron.
 
 #### Scenario: Producto cambiado
-- **WHEN** un producto fue despublicado, marcado como vendido o cambio de precio desde que se agrego al carrito
+- **WHEN** un producto fue eliminado, despublicado, marcado como vendido o cambio de precio desde que se agrego al carrito
 - **THEN** se informa el cambio y se requiere revisar el carrito antes de pagar
 
 

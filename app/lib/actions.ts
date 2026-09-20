@@ -127,6 +127,20 @@ export async function setProductSold(formData: FormData) {
   revalidatePath("/admin/productos");
 }
 
+
+export async function deleteProduct(formData: FormData) {
+  await verifySameOrigin();
+  if (!(await isSellerAuthenticated())) redirect("/admin");
+
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const pb = await createSuperuserPocketBase();
+  await pb.collection("products").delete(id);
+  revalidatePath("/");
+  revalidatePath("/admin/productos");
+}
+
 type CartInput = { id: string; quantity: number };
 
 function parseCartItems(value: FormDataEntryValue | null) {

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { DeleteProductButton } from "../../components/delete-product-button";
 import { ProductForm } from "../../components/product-form";
 import { formatMoney } from "../../lib/money";
 import { listAllProductsForSeller, listOrdersForSeller } from "../../lib/pocketbase";
 import { isSellerAuthenticated } from "../../lib/session";
-import { logoutSeller, setProductPublished, setProductSold } from "../../lib/actions";
+import { deleteProduct, logoutSeller, setProductPublished, setProductSold } from "../../lib/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,10 @@ export default async function ProductsAdminPage() {
                     <button className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100">
                       {product.sold ? "Disponible" : "Marcar vendido"}
                     </button>
+                  </form>
+                  <form action={deleteProduct}>
+                    <input type="hidden" name="id" value={product.id} />
+                    <DeleteProductButton productName={product.name} />
                   </form>
                 </div>
               </article>
