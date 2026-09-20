@@ -41,7 +41,16 @@ async function ensureCollection(config) {
   console.log(`created ${config.name}`);
 }
 
-const productsCollection = await ensureCollection({
+async function ensureField(collection, field) {
+  if (collection.fields?.some((current) => current.name === field.name)) return collection;
+  const updated = await pb.collections.update(collection.id, {
+    fields: [...collection.fields, field],
+  });
+  console.log(`added field ${collection.name}.${field.name}`);
+  return updated;
+}
+
+let productsCollection = await ensureCollection({
   name: "products",
   type: "base",
   listRule: "published = true",
@@ -55,10 +64,12 @@ const productsCollection = await ensureCollection({
     { name: "priceMinor", type: "number", required: true, min: 1, onlyInt: true },
     { name: "currency", type: "text", required: true, max: 3, min: 3 },
     { name: "published", type: "bool", required: false },
+    { name: "sold", type: "bool", required: false },
     { name: "image", type: "file", required: true, maxSelect: 1, maxSize: 5242880, mimeTypes: ["image/jpeg", "image/png", "image/webp"] },
   ],
   indexes: [],
 });
+productsCollection = await ensureField(productsCollection, { name: "sold", type: "bool", required: false });
 
 const ordersCollection = await ensureCollection({
   name: "orders",
@@ -115,5 +126,8 @@ await ensureCollection({
 });
 
 console.log("PocketBase listo para Tienda Cata.");
+
+
+
 
 

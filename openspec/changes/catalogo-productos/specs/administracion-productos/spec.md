@@ -12,7 +12,7 @@ El sistema SHALL exigir una sesion administrativa valida del vendedor para modif
 - **THEN** el sistema rechaza la operacion y no modifica datos
 
 ### Requirement: Publicacion persistente de productos
-El sistema SHALL permitir crear y editar productos desde un telefono con nombre, descripcion opcional, precio positivo e imagen, publicarlos y despublicarlos. Los datos e imagenes SHALL persistir tras reiniciar la aplicacion.
+El sistema SHALL permitir crear y editar productos desde un telefono con nombre, descripcion opcional, precio positivo e imagen, publicarlos, despublicarlos y marcarlos como vendidos o disponibles. Los datos, imagenes y estado vendido SHALL persistir tras reiniciar la aplicacion.
 
 #### Scenario: Publicacion valida
 - **WHEN** el vendedor guarda un producto con nombre, precio positivo y al menos una imagen valida
@@ -25,6 +25,14 @@ El sistema SHALL permitir crear y editar productos desde un telefono con nombre,
 #### Scenario: Despublicacion
 - **WHEN** el administrador despublica un producto
 - **THEN** deja de aparecer en el catalogo y no admite nuevas compras
+
+#### Scenario: Estado vendido
+- **WHEN** el administrador marca un producto publicado como vendido
+- **THEN** el producto sigue visible con un sello "Vendido" y no admite nuevas compras
+
+#### Scenario: Volver a disponible
+- **WHEN** el administrador marca un producto vendido como disponible
+- **THEN** el producto publicado vuelve a admitir compras
 
 ### Requirement: Validacion de imagenes
 El sistema SHALL aceptar JPEG, PNG y WebP de hasta 5 MiB por archivo, incluyendo imagenes tomadas con la camara del telefono o seleccionadas desde galeria/archivo, verificar su contenido y mostrar errores recuperables sin perder los datos del formulario.
@@ -40,3 +48,4 @@ El sistema SHALL aceptar JPEG, PNG y WebP de hasta 5 MiB por archivo, incluyendo
 #### Scenario: Error de almacenamiento
 - **WHEN** falla la carga de una imagen valida
 - **THEN** el sistema permite reintentar y no publica una referencia a una imagen inexistente
+

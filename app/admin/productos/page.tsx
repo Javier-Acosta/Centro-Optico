@@ -4,7 +4,7 @@ import { ProductForm } from "../../components/product-form";
 import { formatMoney } from "../../lib/money";
 import { listAllProductsForSeller, listOrdersForSeller } from "../../lib/pocketbase";
 import { isSellerAuthenticated } from "../../lib/session";
-import { logoutSeller, setProductPublished } from "../../lib/actions";
+import { logoutSeller, setProductPublished, setProductSold } from "../../lib/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -51,15 +51,24 @@ export default async function ProductsAdminPage() {
                 <div>
                   <h3 className="font-semibold text-zinc-950">{product.name}</h3>
                   <p className="text-sm text-zinc-600">{formatMoney(product.priceMinor, product.currency)}</p>
-                  <p className="mt-1 text-sm text-zinc-500">{product.published ? "Publicado" : "Oculto"}</p>
+                  <p className="mt-1 text-sm text-zinc-500">{product.published ? "Publicado" : "Oculto"}{product.sold ? " · Vendido" : ""}</p>
                 </div>
-                <form action={setProductPublished} className="self-center">
-                  <input type="hidden" name="id" value={product.id} />
-                  <input type="hidden" name="published" value={product.published ? "false" : "true"} />
-                  <button className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100">
-                    {product.published ? "Despublicar" : "Publicar"}
-                  </button>
-                </form>
+                <div className="flex flex-col gap-2 self-center">
+                  <form action={setProductPublished}>
+                    <input type="hidden" name="id" value={product.id} />
+                    <input type="hidden" name="published" value={product.published ? "false" : "true"} />
+                    <button className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100">
+                      {product.published ? "Despublicar" : "Publicar"}
+                    </button>
+                  </form>
+                  <form action={setProductSold}>
+                    <input type="hidden" name="id" value={product.id} />
+                    <input type="hidden" name="sold" value={product.sold ? "false" : "true"} />
+                    <button className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100">
+                      {product.sold ? "Disponible" : "Marcar vendido"}
+                    </button>
+                  </form>
+                </div>
               </article>
             ))}
           </div>

@@ -131,6 +131,21 @@ export async function setProductPublished(formData: FormData) {
 }
 
 
+
+export async function setProductSold(formData: FormData) {
+  await verifySameOrigin();
+  if (!(await isSellerAuthenticated())) redirect("/admin");
+
+  const id = String(formData.get("id") || "");
+  const sold = formData.get("sold") === "true";
+  if (!id) return;
+
+  const pb = await createSuperuserPocketBase();
+  await pb.collection("products").update(id, { sold });
+  revalidatePath("/");
+  revalidatePath("/admin/productos");
+}
+
 type CartInput = { id: string; quantity: number };
 
 function parseCartItems(value: FormDataEntryValue | null) {
@@ -153,6 +168,9 @@ export async function createOrder(_state: ActionState, formData: FormData): Prom
   const products = await getPublishedProductsByIds([...new Set(items.map((item) => item.id))]);
   if (products.length !== new Set(items.map((item) => item.id)).size) {
     return { message: "Hay productos que ya no estan publicados. Revisa el carrito." };
+  }
+  if (products.some((product) => product.sold)) {
+    return { message: "Hay productos vendidos en el carrito. Revisa el carrito." };
   }
 
   const productMap = new Map(products.map((product) => [product.id, product]));

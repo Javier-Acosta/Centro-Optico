@@ -7,6 +7,7 @@ export type Product = {
   priceMinor: number;
   currency: string;
   published: boolean;
+  sold: boolean;
   image?: string;
   imageUrl?: string;
 };
@@ -53,6 +54,7 @@ function mapProduct(record: Record<string, unknown>): Product {
     priceMinor: Number(record.priceMinor || 0),
     currency: String(record.currency || "ARS"),
     published: Boolean(record.published),
+    sold: Boolean(record.sold),
     image: typeof record.image === "string" ? record.image : "",
   } satisfies Product;
 
@@ -160,5 +162,6 @@ export async function listOrdersForSeller() {
     }),
   );
 }
+
 
 

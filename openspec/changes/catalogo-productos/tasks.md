@@ -12,6 +12,7 @@
 - [x] 2.1 Implementar carga validada de imagenes a PocketBase desde telefono; verificar camara/galeria, JPEG, PNG, WebP, limite de 5 MiB, archivo falso y fallo de almacenamiento sin referencias rotas.
 - [x] 2.2 Crear formulario del vendedor para crear, editar, poner precio, publicar y despublicar productos en PocketBase; verificar flujo movil, campos obligatorios, precio positivo, imagen y persistencia tras reinicio.
 - [x] 2.3 Crear catalogo publico adaptable consumiendo productos publicados desde PocketBase; verificar catalogo vacio y productos publicados en celular y escritorio, con etiquetas y texto alternativo accesibles.
+- [x] 2.4 Implementar estado vendido para productos; verificar sello visible en catalogo, bloqueo de agregado al carrito, accion administrativa para marcar disponible/vendido y persistencia en PocketBase.
 
 ## 3. Carrito y pedidos
 
@@ -30,4 +31,6 @@
 - [ ] 5.1 Ejecutar lint, build y pruebas de integracion del circuito vendedor-producto-carrito-WhatsApp con PocketBase; registrar resultados y limitaciones.
 - [ ] 5.2 Documentar variables sin secretos, colecciones/reglas PocketBase, backups y configuracion de WhatsApp; verificar recuperacion de una copia de seguridad o export de PocketBase en entorno de prueba.
 - [ ] 5.3 Antes de produccion, registrar confirmacion de moneda y entrega del propietario, actualizar las specs si aparecen envios, stock o cobros online, y verificar que los cobros automaticos permanecen deshabilitados.
+
+
 

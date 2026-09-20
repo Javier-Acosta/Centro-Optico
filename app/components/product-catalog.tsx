@@ -39,6 +39,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
   const [orderState, orderAction, orderPending] = useActionState(createOrder, initialOrderState);
 
   function add(product: Product) {
+    if (product.sold) return;
     setCart((current) => {
       const existing = current.find((line) => line.id === product.id);
       if (existing) {
@@ -68,12 +69,19 @@ export function ProductCatalog({ products }: { products: Product[] }) {
 
         {products.map((product) => (
           <article key={product.id} className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-            {product.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.imageUrl} alt={product.name} className="aspect-square w-full object-cover" />
-            ) : (
-              <div className="aspect-square bg-zinc-100" />
-            )}
+            <div className="relative">
+              {product.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={product.imageUrl} alt={product.name} className="aspect-square w-full object-cover" />
+              ) : (
+                <div className="aspect-square bg-zinc-100" />
+              )}
+              {product.sold ? (
+                <span className="absolute left-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-sm">
+                  Vendido
+                </span>
+              ) : null}
+            </div>
             <div className="space-y-3 p-4">
               <div>
                 <h2 className="text-lg font-semibold text-zinc-950">{product.name}</h2>
@@ -84,9 +92,10 @@ export function ProductCatalog({ products }: { products: Product[] }) {
                 <button
                   type="button"
                   onClick={() => add(product)}
-                  className="rounded-md bg-zinc-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-zinc-800"
+                  className="rounded-md bg-zinc-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+                  disabled={product.sold}
                 >
-                  Agregar
+                  {product.sold ? "Vendido" : "Agregar"}
                 </button>
               </div>
             </div>

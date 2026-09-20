@@ -5,7 +5,7 @@ Permitir que clientes consulten los productos publicados, elijan articulos y los
 ## ADDED Requirements
 
 ### Requirement: Catalogo publico
-El sistema SHALL mostrar nombre, descripcion, precio e imagen de productos publicados sin exigir una cuenta de cliente, en dispositivos moviles y escritorio.
+El sistema SHALL mostrar nombre, descripcion, precio, imagen y sello de vendido cuando corresponda para productos publicados sin exigir una cuenta de cliente, en dispositivos moviles y escritorio.
 
 #### Scenario: Consulta del catalogo
 - **WHEN** un visitante abre la tienda
@@ -15,8 +15,12 @@ El sistema SHALL mostrar nombre, descripcion, precio e imagen de productos publi
 - **WHEN** no hay productos publicados
 - **THEN** se muestra un mensaje claro de catalogo vacio
 
+#### Scenario: Producto vendido
+- **WHEN** un producto publicado esta marcado como vendido
+- **THEN** el visitante ve el sello "Vendido" y no puede agregarlo al carrito
+
 ### Requirement: Gestion de carrito
-El sistema SHALL permitir que el cliente agregue productos publicados desde el catalogo, cambiar cantidades enteras positivas y eliminar articulos; mostrar subtotales y total; y conservar el carrito al recargar el navegador.
+El sistema SHALL permitir que el cliente agregue productos publicados y disponibles desde el catalogo, cambiar cantidades enteras positivas y eliminar articulos; mostrar subtotales y total; y conservar el carrito al recargar el navegador.
 
 #### Scenario: Producto elegido desde el catalogo
 - **WHEN** el cliente selecciona agregar un producto publicado al carrito
@@ -38,5 +42,6 @@ El sistema SHALL permitir que el cliente agregue productos publicados desde el c
 El sistema SHALL verificar precios y publicacion en servidor antes de crear un pedido y solicitar revision al cliente si cambiaron.
 
 #### Scenario: Producto cambiado
-- **WHEN** un producto fue despublicado o cambio de precio desde que se agrego al carrito
+- **WHEN** un producto fue despublicado, marcado como vendido o cambio de precio desde que se agrego al carrito
 - **THEN** se informa el cambio y se requiere revisar el carrito antes de pagar
+
