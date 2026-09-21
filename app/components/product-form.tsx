@@ -20,8 +20,7 @@ export function ProductForm() {
         <input
           name="image"
           type="file"
-          accept="image/jpeg,image/png,image/webp"
-          capture="environment"
+          accept="image/jpeg,image/png,image/webp,image/*"
           required
           className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm"
         />
@@ -57,4 +56,5 @@ export function ProductForm() {
     </form>
   );
 }
+
 
