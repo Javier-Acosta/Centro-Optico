@@ -12,7 +12,7 @@ export function ProductForm() {
     <form action={action} className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
       <div>
         <h2 className="text-lg font-semibold text-zinc-950">Nuevo producto</h2>
-        <p className="text-sm text-zinc-600">Cargalo desde el telefono con foto, precio y publicacion.</p>
+        <p className="text-sm text-zinc-600">Cargalo desde el telefono eligiendo una foto de la galeria o usando la camara.</p>
       </div>
 
       <label className="grid gap-1 text-sm font-medium text-zinc-800">
@@ -57,3 +57,4 @@ export function ProductForm() {
     </form>
   );
 }
+
