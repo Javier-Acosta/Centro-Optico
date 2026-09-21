@@ -74,7 +74,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
             <button type="button" onClick={() => setSelectedProduct(product)} className="relative block w-full text-left" aria-label={`Ver ${product.name} mas grande`}>
               {product.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={product.imageUrl} alt={product.name} className="aspect-square w-full object-cover transition hover:scale-[1.02]" />
+                <img src={product.imageUrl} alt={product.name} className="aspect-square w-full bg-zinc-50 object-contain p-3 transition hover:scale-[1.02]" />
               ) : (
                 <div className="aspect-square bg-zinc-100" />
               )}
@@ -170,7 +170,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
           <div className="relative">
             {selectedProduct.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="max-h-[70vh] w-full object-contain bg-zinc-100" />
+              <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="max-h-[70vh] w-full bg-zinc-100 object-contain p-4" />
             ) : (
               <div className="h-80 bg-zinc-100" />
             )}
@@ -207,6 +207,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
     </>
   );
 }
+
 
 
 
