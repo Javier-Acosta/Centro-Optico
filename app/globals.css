@@ -2,7 +2,9 @@
 
 :root {
   --background: #fafafa;
-  --foreground: #18181b;
+  --foreground: #181412;
+  --brand: #b88a44;
+  --brand-soft: #faf7f0;
 }
 
 @theme inline {
@@ -10,12 +12,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-brand: var(--font-playfair);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 button,
@@ -24,3 +27,4 @@ input,
 textarea {
   outline-color: #18181b;
 }
+

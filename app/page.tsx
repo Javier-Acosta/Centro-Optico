@@ -8,14 +8,14 @@ export default async function Home() {
   const products = await listPublishedProducts().catch(() => []);
 
   return (
-    <main className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white">
+    <main className="min-h-screen bg-[#faf7f0]">
+      <header className="border-b border-[#eadfcd] bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <div>
-            <p className="text-sm font-medium text-zinc-500">Tienda Cata</p>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-950">Productos disponibles</h1>
+            <p className="font-[var(--font-playfair)] text-3xl font-bold tracking-tight text-[#b88a44] sm:text-4xl">Tienda Cata</p>
+            <h1 className="mt-1 text-xl font-bold tracking-tight text-[#181412] sm:text-2xl">Productos disponibles</h1>
           </div>
-          <Link href="/admin" className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100">
+          <Link href="/admin" className="rounded-md border border-[#d8c6aa] bg-[#faf7f0] px-3 py-2 text-sm font-medium text-[#181412] hover:bg-[#f2eadc]">
             Vendedor
           </Link>
         </div>
@@ -26,3 +26,4 @@ export default async function Home() {
     </main>
   );
 }
+
