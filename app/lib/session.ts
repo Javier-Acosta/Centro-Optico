@@ -21,18 +21,24 @@ export async function clearSellerSession() {
   cookieStore.set(cookieName, "", { path: "/", maxAge: 0 });
 }
 
-export async function isSellerAuthenticated() {
+export async function getSellerSession() {
   const token = (await cookies()).get(cookieName)?.value;
-  if (!token) return false;
+  if (!token) return null;
 
   try {
     const pb = createPocketBase();
     pb.authStore.save(token);
-    if (!pb.authStore.isValid) return false;
+    if (!pb.authStore.isValid) return null;
     // PocketBase verifies the signature and checks that the account still exists.
     const auth = await pb.collection("sellers").authRefresh();
-    return auth.record.collectionName === "sellers";
+    if (auth.record.collectionName !== "sellers" || auth.record.disabled === true) return null;
+    if (!["admin", "assistant"].includes(auth.record.role)) return null;
+    return { id: auth.record.id, role: auth.record.role as "admin" | "assistant" };
   } catch {
-    return false;
+    return null;
   }
+}
+
+export async function isSellerAuthenticated() {
+  return (await getSellerSession()) !== null;
 }

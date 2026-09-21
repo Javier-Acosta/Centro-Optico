@@ -35,6 +35,9 @@ export async function loginSeller(_state: ActionState, formData: FormData): Prom
   try {
     const pb = createPocketBase();
     const auth = await pb.collection("sellers").authWithPassword(email, password);
+    if (auth.record.disabled === true || !["admin", "assistant"].includes(auth.record.role)) {
+      return { message: "Esta cuenta no tiene acceso habilitado." };
+    }
     await createSellerSession(auth.token);
     return { ok: true };
   } catch {

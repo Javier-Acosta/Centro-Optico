@@ -52,8 +52,16 @@ Para crear vendedores:
 3. Completar email, password y passwordConfirm; name es opcional.
 4. Guardar y entrar a /admin de la tienda con esa cuenta.
 
-Las cuentas solo pueden ser gestionadas por el administrador de PocketBase. Todos los vendedores tienen acceso al mismo catalogo y pedidos. Para cambiar una contrasena, editar el registro desde PocketBase; para revocar una cuenta, eliminarla.
+El vendedor con rol admin puede gestionar ayudantes desde /admin/usuarios: crear cuentas, cambiar contrasenas y activar o desactivar accesos. Las cuentas nuevas reciben siempre el rol assistant y pueden trabajar con el catalogo y los pedidos existentes. No pueden gestionar usuarios. El administrador de PocketBase conserva la gestion completa de cuentas.
 
 La tienda guarda el token de PocketBase en una cookie HttpOnly, SameSite=Lax y Secure en produccion, con duracion maxima de ocho horas. Cada comprobacion de acceso valida el token con PocketBase. Eliminar la cuenta o cambiar su contrasena invalida el token anterior. Las sesiones anteriores al cambio dejan de ser validas.
 
 Despliegue: publicar el codigo actualizado en Dokploy. Mantener POCKETBASE_URL, POCKETBASE_SUPERUSER_EMAIL y POCKETBASE_SUPERUSER_PASSWORD para las operaciones de servidor existentes, y NEXT_PUBLIC_APP_URL con la URL publica. SELLER_EMAIL, SELLER_PASSWORD y SELLER_SESSION_SECRET ya no se utilizan y pueden eliminarse de Dokploy. El archivo .env.local no se incluye en Docker.
+
+## Roles y ayudantes de ventas
+
+Despues de preparar sellers, ejecutar `node scripts/setup-seller-roles.mjs correo-del-administrador` para asignar el administrador inicial y configurar los campos role y disabled. La migracion conserva contrasenas y es idempotente. Las cuentas existentes sin rol pasan a assistant, salvo el administrador indicado. No se habilita registro publico ni acceso directo a la gestion de cuentas desde PocketBase para vendedores.
+
+En el panel, el administrador vera Usuarios de ventas. Puede crear ayudantes con nombre, email y contrasena de 12 a 72 caracteres, cambiar sus contrasenas y desactivar o reactivar su acceso. Ninguna accion de esta pantalla permite modificar administradores ni elevar un ayudante a administrador. Desactivar una cuenta invalida el acceso en la siguiente comprobacion de sesion.
+
+Prueba de integracion: configurar TEST_ADMIN_EMAIL y TEST_ADMIN_PASSWORD, opcionalmente TEST_APP_URL (por defecto http://localhost:3000), y ejecutar `node scripts/test-seller-roles.mjs`. Usa las variables de PocketBase para verificar resultados y crea un ayudante temporal que elimina al finalizar. Comprueba permisos, intentos de elevacion de rol, bloqueo, reactivacion y cambio de contrasena.

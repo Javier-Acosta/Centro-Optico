@@ -4,13 +4,14 @@ import { DeleteProductButton } from "../../components/delete-product-button";
 import { ProductForm } from "../../components/product-form";
 import { formatMoney } from "../../lib/money";
 import { listAllProductsForSeller, listOrdersForSeller } from "../../lib/pocketbase";
-import { isSellerAuthenticated } from "../../lib/session";
+import { getSellerSession } from "../../lib/session";
 import { deleteProduct, logoutSeller, setProductPublished, setProductSold } from "../../lib/actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProductsAdminPage() {
-  if (!(await isSellerAuthenticated())) redirect("/admin");
+  const seller = await getSellerSession();
+  if (!seller) redirect("/admin");
   const products = await listAllProductsForSeller();
   const orders = await listOrdersForSeller();
 
@@ -22,7 +23,8 @@ export default async function ProductsAdminPage() {
             <p className="text-sm font-medium text-zinc-500">Panel vendedor</p>
             <h1 className="text-2xl font-bold text-zinc-950">Productos</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {seller.role === "admin" && <Link href="/admin/usuarios" className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium">Usuarios de ventas</Link>}
             <Link href="/" className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100">
               Ver tienda
             </Link>
