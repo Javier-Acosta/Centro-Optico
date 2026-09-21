@@ -43,7 +43,7 @@ export async function createSuperuserPocketBase() {
 
 export function productImageUrl(product: Product) {
   if (!product.image) return "";
-  return createPocketBase().files.getURL(product, product.image, { thumb: "900x900" });
+  return `/product-images/${encodeURIComponent(product.id)}/${encodeURIComponent(product.image)}`;
 }
 
 function mapProduct(record: Record<string, unknown>): Product {
