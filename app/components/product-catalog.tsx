@@ -61,8 +61,8 @@ export function ProductCatalog({ products }: { products: Product[] }) {
 
   return (
     <>
-    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-      <section aria-label="Productos" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <section aria-label="Productos" className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {products.length === 0 ? (
           <div className="sm:col-span-2 xl:col-span-3 rounded-lg border border-dashed border-zinc-300 bg-white p-8 text-center text-zinc-600">
             Todavia no hay productos publicados.
@@ -70,7 +70,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
         ) : null}
 
         {products.map((product) => (
-          <article key={product.id} className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <article key={product.id} className="min-w-0 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
             <button type="button" onClick={() => setSelectedProduct(product)} className="relative block w-full text-left" aria-label={`Ver ${product.name} mas grande`}>
               {product.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -83,19 +83,19 @@ export function ProductCatalog({ products }: { products: Product[] }) {
                   Vendido
                 </span>
               ) : null}
-              <span className="absolute bottom-3 right-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-zinc-800 shadow-sm">Ver mas</span>
+              <span className="absolute bottom-3 right-3 max-w-[calc(100%-1.5rem)] rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-zinc-800 shadow-sm">Ver mas</span>
             </button>
             <div className="space-y-3 p-4">
               <div>
                 <button type="button" onClick={() => setSelectedProduct(product)} className="text-left text-lg font-semibold text-zinc-950 hover:underline">{product.name}</button>
                 {product.description ? <p className="mt-1 line-clamp-3 text-sm text-zinc-600">{product.description}</p> : null}
               </div>
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-lg font-bold text-zinc-950">{formatMoney(product.priceMinor, product.currency)}</span>
                 <button
                   type="button"
                   onClick={() => add(product)}
-                  className="rounded-md bg-zinc-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+                  className="shrink-0 rounded-md bg-zinc-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
                   disabled={product.sold}
                 >
                   {product.sold ? "Vendido" : "Agregar"}
@@ -106,7 +106,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
         ))}
       </section>
 
-      <aside className="h-fit rounded-lg border border-zinc-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
+      <aside className="min-w-0 h-fit rounded-lg border border-zinc-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
         <h2 className="text-lg font-semibold text-zinc-950">Carrito</h2>
         {cartProducts.length === 0 ? (
           <p className="mt-3 text-sm text-zinc-600">El carrito esta vacio.</p>
@@ -123,7 +123,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
                     Quitar
                   </button>
                 </div>
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <label className="text-sm text-zinc-600">
                     Cantidad
                     <input
@@ -207,6 +207,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
     </>
   );
 }
+
 
 
 
