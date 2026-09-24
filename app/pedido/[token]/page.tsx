@@ -14,7 +14,7 @@ export default async function OrderPage({ params }: PageProps<"/pedido/[token]">
     <main className="min-h-screen bg-zinc-50 px-4 py-8">
       <section className="mx-auto max-w-xl rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
         <p className="text-sm font-medium text-zinc-500">Pedido</p>
-        <h1 className="mt-1 text-2xl font-bold text-zinc-950">Estado: Pendiente</h1>
+        <h1 className="mt-1 text-2xl font-bold text-zinc-950">Estado: {order.status === "approved" ? "Pagado" : "Pendiente"}</h1>
         <p className="mt-2 text-sm text-zinc-600">El pedido quedo registrado. Coordinaremos pago y entrega por WhatsApp con el contacto indicado.</p>
 
         <div className="mt-6 space-y-3">
@@ -41,5 +41,6 @@ export default async function OrderPage({ params }: PageProps<"/pedido/[token]">
     </main>
   );
 }
+
 
 

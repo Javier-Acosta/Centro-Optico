@@ -105,8 +105,29 @@ export type Order = {
   status: OrderStatus;
   totalMinor: number;
   currency: string;
+  created: string;
+  updated: string;
   items?: OrderItemSnapshot[];
 };
+
+function mapOrder(order: Record<string, unknown>, items: Record<string, unknown>[]) {
+  return {
+    id: String(order.id),
+    email: String(order.email || ""),
+    publicToken: String(order.publicToken || ""),
+    status: (String(order.status || "pending") as OrderStatus),
+    totalMinor: Number(order.totalMinor || 0),
+    currency: String(order.currency || "ARS"),
+    created: String(order.created || ""),
+    updated: String(order.updated || ""),
+    items: items.map((item) => ({
+      productName: String(item.productName || ""),
+      unitPriceMinor: Number(item.unitPriceMinor || 0),
+      quantity: Number(item.quantity || 0),
+      subtotalMinor: Number(item.subtotalMinor || 0),
+    })),
+  } satisfies Order;
+}
 
 export async function getOrderByToken(token: string) {
   const pb = await createSuperuserPocketBase();
@@ -119,20 +140,7 @@ export async function getOrderByToken(token: string) {
     requestKey: null,
   });
 
-  return {
-    id: String(order.id),
-    email: String(order.email || ""),
-    publicToken: String(order.publicToken || ""),
-    status: (String(order.status || "pending") as OrderStatus),
-    totalMinor: Number(order.totalMinor || 0),
-    currency: String(order.currency || "ARS"),
-    items: items.map((item) => ({
-      productName: String(item.productName || ""),
-      unitPriceMinor: Number(item.unitPriceMinor || 0),
-      quantity: Number(item.quantity || 0),
-      subtotalMinor: Number(item.subtotalMinor || 0),
-    })),
-  } satisfies Order;
+  return mapOrder(order as unknown as Record<string, unknown>, items as unknown as Record<string, unknown>[]);
 }
 
 export async function listOrdersForSeller() {
@@ -145,20 +153,7 @@ export async function listOrdersForSeller() {
         sort: "id",
         requestKey: null,
       });
-      return {
-        id: String(order.id),
-        email: String(order.email || ""),
-        publicToken: String(order.publicToken || ""),
-        status: (String(order.status || "pending") as OrderStatus),
-        totalMinor: Number(order.totalMinor || 0),
-        currency: String(order.currency || "ARS"),
-        items: items.map((item) => ({
-          productName: String(item.productName || ""),
-          unitPriceMinor: Number(item.unitPriceMinor || 0),
-          quantity: Number(item.quantity || 0),
-          subtotalMinor: Number(item.subtotalMinor || 0),
-        })),
-      } satisfies Order;
+      return mapOrder(order as unknown as Record<string, unknown>, items as unknown as Record<string, unknown>[]);
     }),
   );
 }

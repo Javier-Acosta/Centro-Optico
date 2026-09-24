@@ -36,6 +36,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
       .filter(Boolean) as Array<Product & { quantity: number; subtotal: number }>;
   }, [cart, products]);
 
+  const orderItems = cartProducts.map((item) => ({ id: item.id, quantity: item.quantity }));
   const total = cartProducts.reduce((sum, item) => sum + item.subtotal, 0);
   const [orderState, orderAction, orderPending] = useActionState(createOrder, initialOrderState);
 
@@ -144,7 +145,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
               <span>{formatMoney(total, cartProducts[0]?.currency || "ARS")}</span>
             </div>
             <form action={orderAction} className="space-y-3">
-              <input type="hidden" name="items" value={JSON.stringify(cart)} />
+              <input type="hidden" name="items" value={JSON.stringify(orderItems)} />
               <label className="grid gap-1 text-sm font-medium text-zinc-800">
                 Email de contacto
                 <input name="email" type="email" required className="rounded-md border border-zinc-300 px-3 py-2" />
@@ -153,7 +154,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
               <button
                 type="submit"
                 className="w-full rounded-md bg-zinc-950 px-4 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300"
-                disabled={orderPending || cart.length === 0}
+                disabled={orderPending || orderItems.length === 0}
               >
                 {orderPending ? "Preparando WhatsApp..." : "Enviar pedido por WhatsApp"}
               </button>
@@ -207,6 +208,7 @@ export function ProductCatalog({ products }: { products: Product[] }) {
     </>
   );
 }
+
 
 
 

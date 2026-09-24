@@ -8,7 +8,7 @@ import { createSellerSession, clearSellerSession, isSellerAuthenticated } from "
 import { createPocketBase, createSuperuserPocketBase, getPublishedProductsByIds } from "./pocketbase";
 import { parsePriceToMinor } from "./money";
 
-const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 const maxImageSize = 5 * 1024 * 1024;
 
 export type ActionState = {
@@ -53,14 +53,21 @@ export async function logoutSeller() {
 
 async function validImage(file: FormDataEntryValue | null) {
   if (!(file instanceof File) || file.size === 0) return "Subi una imagen del producto.";
-  if (!allowedImageTypes.has(file.type)) return "La imagen debe ser JPEG, PNG o WebP.";
   if (file.size > maxImageSize) return "La imagen no puede superar 5 MiB.";
 
-  const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  const extension = file.name.split(".").pop()?.toLowerCase() || "";
+  const typeAllowed = allowedImageTypes.has(file.type);
+  const extensionAllowed = ["jpg", "jpeg", "png", "webp", "heic", "heif"].includes(extension);
+  if (!typeAllowed && !extensionAllowed) return "La imagen debe ser JPEG, PNG, WebP, HEIC o HEIF.";
+
+  const bytes = new Uint8Array(await file.slice(0, 32).arrayBuffer());
   const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
   const isPng = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
   const isWebp = bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
-  if (!isJpeg && !isPng && !isWebp) return "El archivo no parece una imagen valida.";
+  const boxType = String.fromCharCode(...bytes.slice(4, 8));
+  const brand = String.fromCharCode(...bytes.slice(8, 12));
+  const isHeic = boxType === "ftyp" && ["heic", "heix", "hevc", "hevx", "mif1", "msf1"].includes(brand);
+  if (!isJpeg && !isPng && !isWebp && !isHeic) return "El archivo no parece una imagen valida.";
 
   return null;
 }
@@ -100,6 +107,46 @@ export async function createProduct(_state: ActionState, formData: FormData): Pr
   return { ok: true, message: "Producto guardado." };
 }
 
+export async function updateProduct(_state: ActionState, formData: FormData): Promise<ActionState> {
+  await verifySameOrigin();
+  if (!(await isSellerAuthenticated())) return { message: "Sesion vencida. Volve a ingresar." };
+
+  const id = String(formData.get("id") || "");
+  const name = String(formData.get("name") || "").trim();
+  const description = String(formData.get("description") || "").trim();
+  const priceMinor = parsePriceToMinor(formData.get("price"));
+  const image = formData.get("image");
+  const published = formData.get("published") === "on";
+
+  if (!id) return { message: "Falta el producto a editar." };
+  if (!name) return { message: "El nombre es obligatorio." };
+  if (!priceMinor) return { message: "Ingresa un precio positivo." };
+
+  if (image instanceof File && image.size > 0) {
+    const imageError = await validImage(image);
+    if (imageError) return { message: imageError };
+  }
+
+  try {
+    const pb = await createSuperuserPocketBase();
+    const payload = new FormData();
+    payload.set("name", name);
+    payload.set("description", description);
+    payload.set("priceMinor", String(priceMinor));
+    payload.set("currency", "ARS");
+    payload.set("published", String(published));
+    if (image instanceof File && image.size > 0) payload.set("image", image);
+
+    await pb.collection("products").update(id, payload);
+  } catch {
+    return { message: "No se pudo actualizar el producto. Intenta nuevamente." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/productos");
+  return { ok: true, message: "Publicacion actualizada." };
+}
+
 export async function setProductPublished(formData: FormData) {
   await verifySameOrigin();
   if (!(await isSellerAuthenticated())) redirect("/admin");
@@ -113,8 +160,6 @@ export async function setProductPublished(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/admin/productos");
 }
-
-
 
 export async function setProductSold(formData: FormData) {
   await verifySameOrigin();
@@ -130,7 +175,6 @@ export async function setProductSold(formData: FormData) {
   revalidatePath("/admin/productos");
 }
 
-
 export async function deleteProduct(formData: FormData) {
   await verifySameOrigin();
   if (!(await isSellerAuthenticated())) redirect("/admin");
@@ -141,6 +185,58 @@ export async function deleteProduct(formData: FormData) {
   const pb = await createSuperuserPocketBase();
   await pb.collection("products").delete(id);
   revalidatePath("/");
+  revalidatePath("/admin/productos");
+}
+
+export async function setOrderPaid(formData: FormData) {
+  await verifySameOrigin();
+  if (!(await isSellerAuthenticated())) redirect("/admin");
+
+  const id = String(formData.get("id") || "");
+  const paid = formData.get("paid") === "true";
+  if (!id) return;
+
+  const pb = await createSuperuserPocketBase();
+  await pb.collection("orders").update(id, { status: paid ? "approved" : "pending" });
+  revalidatePath("/admin/productos");
+}
+
+async function deleteOrderWithItems(id: string) {
+  const pb = await createSuperuserPocketBase();
+  const items = await pb.collection("order_items").getFullList({
+    filter: `order = "${id.replaceAll('"', "")}"`,
+    requestKey: null,
+  });
+  for (const item of items) {
+    await pb.collection("order_items").delete(item.id);
+  }
+  await pb.collection("orders").delete(id);
+}
+
+export async function deleteOrder(formData: FormData) {
+  await verifySameOrigin();
+  if (!(await isSellerAuthenticated())) redirect("/admin");
+
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  await deleteOrderWithItems(id);
+  revalidatePath("/admin/productos");
+}
+
+export async function clearPaidOrdersThisMonth(formData: FormData) {
+  await verifySameOrigin();
+  if (!(await isSellerAuthenticated())) redirect("/admin");
+
+  const ids = String(formData.get("ids") || "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => /^[A-Za-z0-9_-]+$/.test(id));
+  if (ids.length === 0) return;
+
+  for (const id of ids) {
+    await deleteOrderWithItems(id);
+  }
   revalidatePath("/admin/productos");
 }
 
@@ -205,12 +301,8 @@ export async function createOrder(_state: ActionState, formData: FormData): Prom
     });
   }
 
-
   revalidatePath("/admin/productos");
   redirect(`/pedido/${publicToken}/whatsapp`);
 }
-
-
-
 
 
