@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { ConfirmSubmitButton } from "../../components/confirm-submit-button";
 import { DeleteProductButton } from "../../components/delete-product-button";
 import { ProductForm } from "../../components/product-form";
+import { StoreSettingsForm } from "../../components/store-settings-form";
 import { formatMoney } from "../../lib/money";
-import { listAllProductsForSeller, listOrdersForSeller } from "../../lib/pocketbase";
+import { getStoreName, listAllProductsForSeller, listOrdersForSeller } from "../../lib/pocketbase";
 import { getSellerSession } from "../../lib/session";
 import { clearPaidOrdersThisMonth, deleteOrder, deleteProduct, logoutSeller, setOrderPaid, setProductPublished, setProductSold } from "../../lib/actions";
 
@@ -13,8 +14,11 @@ export const dynamic = "force-dynamic";
 export default async function ProductsAdminPage() {
   const seller = await getSellerSession();
   if (!seller) redirect("/admin");
-  const products = await listAllProductsForSeller();
-  const orders = await listOrdersForSeller();
+  const [products, orders, storeName] = await Promise.all([
+    listAllProductsForSeller(),
+    listOrdersForSeller(),
+    getStoreName(),
+  ]);
   const now = new Date();
   const paidOrdersThisMonth = orders.filter((order) => order.status === "approved");
   const soldProductsThisMonth = products.filter((product) => product.sold);
@@ -45,7 +49,10 @@ export default async function ProductsAdminPage() {
       </header>
 
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[380px_1fr]">
-        <ProductForm />
+        <div className="grid gap-6">
+          <StoreSettingsForm storeName={storeName} />
+          <ProductForm />
+        </div>
 
         <div className="grid gap-6">
         <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
@@ -165,6 +172,9 @@ export default async function ProductsAdminPage() {
     </main>
   );
 }
+
+
+
 
 
 

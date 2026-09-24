@@ -16,6 +16,8 @@ export type Product = {
 
 export type OrderStatus = "pending" | "approved" | "rejected";
 
+export const defaultStoreName = "Tienda Cata";
+
 function pocketBaseUrl() {
   const url = process.env.POCKETBASE_URL;
 
@@ -65,6 +67,33 @@ function mapProduct(record: Record<string, unknown>): Product {
   return { ...product, imageUrl: productImageUrl(product) };
 }
 
+
+export async function getStoreName() {
+  try {
+    const pb = await createSuperuserPocketBase();
+    const setting = await pb.collection("app_settings").getFirstListItem('key = "storeName"', {
+      requestKey: null,
+    });
+    return String(setting.value || defaultStoreName);
+  } catch {
+    return defaultStoreName;
+  }
+}
+
+export async function setStoreName(value: string) {
+  const name = value.trim();
+  if (!name) throw new Error("El nombre es obligatorio.");
+
+  const pb = await createSuperuserPocketBase();
+  try {
+    const setting = await pb.collection("app_settings").getFirstListItem('key = "storeName"', {
+      requestKey: null,
+    });
+    await pb.collection("app_settings").update(setting.id, { value: name });
+  } catch {
+    await pb.collection("app_settings").create({ key: "storeName", value: name });
+  }
+}
 export async function listPublishedProducts() {
   const pb = createPocketBase();
   const records = await pb.collection("products").getFullList({
@@ -161,6 +190,11 @@ export async function listOrdersForSeller() {
     }),
   );
 }
+
+
+
+
+
 
 
 

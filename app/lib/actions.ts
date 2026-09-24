@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSellerSession, clearSellerSession, isSellerAuthenticated } from "./session";
-import { createPocketBase, createSuperuserPocketBase, getPublishedProductsByIds } from "./pocketbase";
+import { createPocketBase, createSuperuserPocketBase, getPublishedProductsByIds, setStoreName } from "./pocketbase";
 import { parsePriceToMinor } from "./money";
 
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
@@ -72,6 +72,26 @@ async function validImage(file: FormDataEntryValue | null) {
   return null;
 }
 
+
+export async function updateStoreSettings(_state: ActionState, formData: FormData): Promise<ActionState> {
+  await verifySameOrigin();
+  if (!(await isSellerAuthenticated())) return { message: "Sesion vencida. Volve a ingresar." };
+
+  const storeName = String(formData.get("storeName") || "").trim();
+  if (!storeName) return { message: "Ingresa el nombre de la tienda." };
+  if (storeName.length > 80) return { message: "El nombre no puede superar 80 caracteres." };
+
+  try {
+    await setStoreName(storeName);
+  } catch {
+    return { message: "No se pudo guardar el nombre. Revisa la configuracion de PocketBase." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/admin/productos");
+  return { ok: true, message: "Nombre actualizado." };
+}
 export async function createProduct(_state: ActionState, formData: FormData): Promise<ActionState> {
   await verifySameOrigin();
   if (!(await isSellerAuthenticated())) return { message: "Sesion vencida. Volve a ingresar." };
@@ -304,5 +324,6 @@ export async function createOrder(_state: ActionState, formData: FormData): Prom
   revalidatePath("/admin/productos");
   redirect(`/pedido/${publicToken}/whatsapp`);
 }
+
 
 
