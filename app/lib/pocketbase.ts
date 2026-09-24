@@ -80,11 +80,34 @@ export async function getStoreName() {
   }
 }
 
+async function ensureAppSettingsCollection() {
+  const pb = await createSuperuserPocketBase();
+  try {
+    await pb.collections.getOne("app_settings");
+  } catch {
+    await pb.collections.create({
+      name: "app_settings",
+      type: "base",
+      listRule: null,
+      viewRule: null,
+      createRule: null,
+      updateRule: null,
+      deleteRule: null,
+      fields: [
+        { name: "key", type: "text", required: true, presentable: true, min: 1, max: 80 },
+        { name: "value", type: "text", required: true, presentable: false, min: 1, max: 120 },
+      ],
+      indexes: ["CREATE UNIQUE INDEX idx_app_settings_key ON app_settings (key)"],
+    });
+  }
+  return pb;
+}
+
 export async function setStoreName(value: string) {
   const name = value.trim();
   if (!name) throw new Error("El nombre es obligatorio.");
 
-  const pb = await createSuperuserPocketBase();
+  const pb = await ensureAppSettingsCollection();
   try {
     const setting = await pb.collection("app_settings").getFirstListItem('key = "storeName"', {
       requestKey: null,
@@ -190,6 +213,7 @@ export async function listOrdersForSeller() {
     }),
   );
 }
+
 
 
 
