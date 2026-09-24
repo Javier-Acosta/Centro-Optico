@@ -20,10 +20,7 @@ export default async function ProductsAdminPage() {
     const paidAt = order.updated ? new Date(order.updated) : null;
     return order.status === "approved" && paidAt && paidAt.getFullYear() === now.getFullYear() && paidAt.getMonth() === now.getMonth();
   });
-  const soldProductsThisMonth = products.filter((product) => {
-    const soldAt = product.updated ? new Date(product.updated) : null;
-    return product.sold && soldAt && soldAt.getFullYear() === now.getFullYear() && soldAt.getMonth() === now.getMonth();
-  });
+  const soldProductsThisMonth = products.filter((product) => product.sold);
   const paidOrdersTotalMinor = paidOrdersThisMonth.reduce((sum, order) => sum + order.totalMinor, 0);
   const soldProductsTotalMinor = soldProductsThisMonth.reduce((sum, product) => sum + product.priceMinor, 0);
   const monthlyTotalMinor = paidOrdersTotalMinor + soldProductsTotalMinor;
@@ -171,5 +168,6 @@ export default async function ProductsAdminPage() {
     </main>
   );
 }
+
 
 
