@@ -16,10 +16,7 @@ export default async function ProductsAdminPage() {
   const products = await listAllProductsForSeller();
   const orders = await listOrdersForSeller();
   const now = new Date();
-  const paidOrdersThisMonth = orders.filter((order) => {
-    const paidAt = order.updated ? new Date(order.updated) : null;
-    return order.status === "approved" && paidAt && paidAt.getFullYear() === now.getFullYear() && paidAt.getMonth() === now.getMonth();
-  });
+  const paidOrdersThisMonth = orders.filter((order) => order.status === "approved");
   const soldProductsThisMonth = products.filter((product) => product.sold);
   const paidOrdersTotalMinor = paidOrdersThisMonth.reduce((sum, order) => sum + order.totalMinor, 0);
   const soldProductsTotalMinor = soldProductsThisMonth.reduce((sum, product) => sum + product.priceMinor, 0);
@@ -168,6 +165,7 @@ export default async function ProductsAdminPage() {
     </main>
   );
 }
+
 
 
 
