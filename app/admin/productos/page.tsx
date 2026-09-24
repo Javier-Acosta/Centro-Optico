@@ -20,8 +20,14 @@ export default async function ProductsAdminPage() {
     const paidAt = order.updated ? new Date(order.updated) : null;
     return order.status === "approved" && paidAt && paidAt.getFullYear() === now.getFullYear() && paidAt.getMonth() === now.getMonth();
   });
-  const monthlyTotalMinor = paidOrdersThisMonth.reduce((sum, order) => sum + order.totalMinor, 0);
-  const monthlyCurrency = paidOrdersThisMonth[0]?.currency || orders[0]?.currency || "ARS";
+  const soldProductsThisMonth = products.filter((product) => {
+    const soldAt = product.updated ? new Date(product.updated) : null;
+    return product.sold && soldAt && soldAt.getFullYear() === now.getFullYear() && soldAt.getMonth() === now.getMonth();
+  });
+  const paidOrdersTotalMinor = paidOrdersThisMonth.reduce((sum, order) => sum + order.totalMinor, 0);
+  const soldProductsTotalMinor = soldProductsThisMonth.reduce((sum, product) => sum + product.priceMinor, 0);
+  const monthlyTotalMinor = paidOrdersTotalMinor + soldProductsTotalMinor;
+  const monthlyCurrency = paidOrdersThisMonth[0]?.currency || soldProductsThisMonth[0]?.currency || orders[0]?.currency || products[0]?.currency || "ARS";
   const monthlyLabel = new Intl.DateTimeFormat("es-AR", { month: "long", year: "numeric" }).format(now);
 
   return (
@@ -53,7 +59,7 @@ export default async function ProductsAdminPage() {
             <div>
               <p className="text-sm font-medium text-zinc-500">Total vendido en {monthlyLabel}</p>
               <h2 className="text-2xl font-bold text-zinc-950">{formatMoney(monthlyTotalMinor, monthlyCurrency)}</h2>
-              <p className="mt-1 text-sm text-zinc-600">{paidOrdersThisMonth.length} pedidos pagados</p>
+              <p className="mt-1 text-sm text-zinc-600">{paidOrdersThisMonth.length} pedidos pagados · {soldProductsThisMonth.length} productos vendidos</p>
             </div>
             <form action={clearPaidOrdersThisMonth}>
               <input type="hidden" name="ids" value={paidOrdersThisMonth.map((order) => order.id).join(",")} />
@@ -165,4 +171,5 @@ export default async function ProductsAdminPage() {
     </main>
   );
 }
+
 

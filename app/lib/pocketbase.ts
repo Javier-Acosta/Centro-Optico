@@ -10,6 +10,8 @@ export type Product = {
   sold: boolean;
   image?: string;
   imageUrl?: string;
+  created: string;
+  updated: string;
 };
 
 export type OrderStatus = "pending" | "approved" | "rejected";
@@ -56,6 +58,8 @@ function mapProduct(record: Record<string, unknown>): Product {
     published: Boolean(record.published),
     sold: Boolean(record.sold),
     image: typeof record.image === "string" ? record.image : "",
+    created: String(record.created || ""),
+    updated: String(record.updated || ""),
   } satisfies Product;
 
   return { ...product, imageUrl: productImageUrl(product) };
@@ -157,6 +161,8 @@ export async function listOrdersForSeller() {
     }),
   );
 }
+
+
 
 
 
