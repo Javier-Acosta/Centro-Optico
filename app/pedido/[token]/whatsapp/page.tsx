@@ -12,7 +12,6 @@ export default async function OrderWhatsAppPage({ params }: PageProps<"/pedido/[
   if (!order) notFound();
 
   const whatsappUrl = buildWhatsAppOrderUrl({
-    publicToken: order.publicToken,
     email: order.email,
     totalMinor: order.totalMinor,
     currency: order.currency,
@@ -37,3 +36,4 @@ export default async function OrderWhatsAppPage({ params }: PageProps<"/pedido/[
     </main>
   );
 }
+
