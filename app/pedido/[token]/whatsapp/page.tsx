@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getOrderByToken } from "../../../lib/pocketbase";
+import { getOrderByToken, getStoreName } from "../../../lib/pocketbase";
 import { buildWhatsAppOrderUrl } from "../../../lib/whatsapp";
 import { WhatsAppRedirect } from "./whatsapp-redirect";
 
@@ -8,10 +8,14 @@ export const dynamic = "force-dynamic";
 
 export default async function OrderWhatsAppPage({ params }: PageProps<"/pedido/[token]/whatsapp">) {
   const { token } = await params;
-  const order = await getOrderByToken(token).catch(() => null);
+  const [order, storeName] = await Promise.all([
+    getOrderByToken(token).catch(() => null),
+    getStoreName(),
+  ]);
   if (!order) notFound();
 
   const whatsappUrl = buildWhatsAppOrderUrl({
+    storeName,
     email: order.email,
     totalMinor: order.totalMinor,
     currency: order.currency,

@@ -4,13 +4,14 @@ import type { OrderItemSnapshot } from "./pocketbase";
 export const sellerWhatsAppNumber = process.env.SELLER_WHATSAPP_NUMBER || "5493834523879";
 
 export function buildWhatsAppOrderUrl(order: {
+  storeName: string;
   email: string;
   totalMinor: number;
   currency: string;
   items: OrderItemSnapshot[];
 }) {
   const lines = [
-    "Hola, quiero hacer este pedido en Tienda Cata:",
+    `Hola, quiero hacer este pedido en ${order.storeName}:`,
     "",
     ...order.items.map((item) => `- ${item.productName} x ${item.quantity}: ${formatAmount(item.subtotalMinor, order.currency)}`),
     "",
